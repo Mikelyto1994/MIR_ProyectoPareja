@@ -100,104 +100,108 @@ async function getProductById(req, res) {
   }
 }
 async function updateProduct(req, res) {
-  const { id } = req.params;
+  //const { id } = req.params;
 
   // Esquema de validación de datos para la actualización (usamos el mismo esquema que para crear un producto)
   const updateProductSchema = createProductSchema.partial(); // Permite campos opcionales
 
-  async function updateProduct(req, res) {
-    const { id } = req.params;
+  //async function updateProduct(req, res) {
+  const { id } = req.params;
 
-    try {
-      // 1. Validar los datos de la solicitud con Zod
-      const data = updateProductSchema.parse(req.body); // Validar la entrada del producto
+  try {
+    // 1. Validar los datos de la solicitud con Zod
+    console.log("req.body");
+    console.log(req.body);
+    const data = updateProductSchema.parse(req.body); // Validar la entrada del producto
 
-      // 2. Verificar si el producto existe en la base de datos
-      const productExists = await prisma.product.findUnique({
-        where: { id: parseInt(id) },
-      });
+    console.log("data");
+    console.log(data);
+    // 2. Verificar si el producto existe en la base de datos
+    const productExists = await prisma.product.findUnique({
+      where: { id: parseInt(id) },
+    });
 
-      if (!productExists) {
-        console.error(`Producto con ID ${id} no encontrado`);
-        return res.status(404).json({ message: "Producto no encontrado" });
-      }
-
-      // 3. Verificar que las relaciones (size, brand, material, category) sean válidas
-      let sizeExists = null,
-        brandExists = null,
-        materialExists = null,
-        categoryExists = null;
-
-      if (data.sizeId) {
-        sizeExists = await prisma.size.findUnique({
-          where: { id: data.sizeId },
-        });
-        if (!sizeExists)
-          return res.status(400).json({ message: "Tamaño no válido" });
-      }
-
-      if (data.brandId) {
-        brandExists = await prisma.brand.findUnique({
-          where: { id: data.brandId },
-        });
-        if (!brandExists)
-          return res.status(400).json({ message: "Marca no válida" });
-      }
-
-      if (data.materialId) {
-        materialExists = await prisma.material.findUnique({
-          where: { id: data.materialId },
-        });
-        if (!materialExists)
-          return res.status(400).json({ message: "Material no válido" });
-      }
-
-      if (data.categoryId) {
-        categoryExists = await prisma.category.findUnique({
-          where: { id: data.categoryId },
-        });
-        if (!categoryExists)
-          return res.status(400).json({ message: "Categoría no válida" });
-      }
-
-      // 4. Actualizar el producto solo con los valores que se pasaron en la solicitud
-      const updatedProduct = await prisma.product.update({
-        where: { id: parseInt(id) },
-        data: {
-          name: data.name ?? productExists.name, // Mantener el valor actual si no se pasa uno nuevo
-          price: data.price ?? productExists.price,
-          description: data.description ?? productExists.description,
-          stock: data.stock ?? productExists.stock,
-          sizeId: data.sizeId ?? productExists.sizeId,
-          brandId: data.brandId ?? productExists.brandId,
-          materialId: data.materialId ?? productExists.materialId,
-          categoryId: data.categoryId ?? productExists.categoryId,
-          imageUrl: data.imageUrl ?? productExists.imageUrl, // Solo se cambia si se pasa un nuevo valor
-        },
-      });
-
-      console.log(`Producto con ID ${id} actualizado exitosamente`);
-      res.status(200).json({
-        message: "Producto actualizado exitosamente",
-        product: updatedProduct,
-      });
-    } catch (error) {
-      // 5. Manejo de errores en la actualización
-      console.error("Error actualizando producto:", error);
-
-      // Verifica si el error es un error de validación
-      if (error.errors) {
-        return res
-          .status(400)
-          .json({ message: error.errors || "Error de validación" });
-      }
-
-      // Si es un error general, responder con un error 500
-      return res
-        .status(500)
-        .json({ message: "Error interno del servidor", error: error.message });
+    if (!productExists) {
+      console.error(`Producto con ID ${id} no encontrado`);
+      return res.status(404).json({ message: "Producto no encontrado" });
     }
+
+    // 3. Verificar que las relaciones (size, brand, material, category) sean válidas
+    let sizeExists = null,
+      brandExists = null,
+      materialExists = null,
+      categoryExists = null;
+
+    if (data.sizeId) {
+      sizeExists = await prisma.size.findUnique({
+        where: { id: data.sizeId },
+      });
+      if (!sizeExists)
+        return res.status(400).json({ message: "Tamaño no válido" });
+    }
+
+    if (data.brandId) {
+      brandExists = await prisma.brand.findUnique({
+        where: { id: data.brandId },
+      });
+      if (!brandExists)
+        return res.status(400).json({ message: "Marca no válida" });
+    }
+
+    if (data.materialId) {
+      materialExists = await prisma.material.findUnique({
+        where: { id: data.materialId },
+      });
+      if (!materialExists)
+        return res.status(400).json({ message: "Material no válido" });
+    }
+
+    if (data.categoryId) {
+      categoryExists = await prisma.category.findUnique({
+        where: { id: data.categoryId },
+      });
+      if (!categoryExists)
+        return res.status(400).json({ message: "Categoría no válida" });
+    }
+
+    // 4. Actualizar el producto solo con los valores que se pasaron en la solicitud
+    const updatedProduct = await prisma.product.update({
+      where: { id: parseInt(id) },
+      data: {
+        name: data.name ?? productExists.name, // Mantener el valor actual si no se pasa uno nuevo
+        price: data.price ?? productExists.price,
+        description: data.description ?? productExists.description,
+        stock: data.stock ?? productExists.stock,
+        sizeId: data.sizeId ?? productExists.sizeId,
+        brandId: data.brandId ?? productExists.brandId,
+        materialId: data.materialId ?? productExists.materialId,
+        categoryId: data.categoryId ?? productExists.categoryId,
+        imageUrl: data.imageUrl ?? productExists.imageUrl, // Solo se cambia si se pasa un nuevo valor
+      },
+    });
+
+    console.log(`Producto con ID ${id} actualizado exitosamente`);
+    res.status(200).json({
+      message: "Producto actualizado exitosamente",
+      product: updatedProduct,
+    });
+  } catch (error) {
+    // 5. Manejo de errores en la actualización
+    console.error("Error actualizando producto:", error);
+
+    // Verifica si el error es un error de validación
+    if (error.errors) {
+      return res
+        .status(400)
+        .json({ message: error.errors || "Error de validación" });
+    }
+
+    // Si es un error general, responder con un error 500
+    return res
+      .status(500)
+      .json({ message: "Error interno del servidor", error: error.message });
   }
+  //}
 }
 
 module.exports = {

@@ -1,8 +1,8 @@
 // src/pages/Pedido.jsx
-import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import styled from 'styled-components';
+import React, { useState, useEffect } from "react";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import styled from "styled-components";
 
 const Container = styled.div`
   display: flex;
@@ -59,7 +59,7 @@ const Button = styled.button`
   cursor: pointer;
 
   &:hover {
-    background-color: rgb(231,211,111);
+    background-color: rgb(231, 211, 111);
   }
 `;
 
@@ -78,22 +78,24 @@ const ProductRow = styled.div`
 
 const Pedido = () => {
   const [formData, setFormData] = useState({
-    nombres: '',
-    celular: '',
-    correo: '',
-    direccion: ''
+    nombres: "",
+    celular: "",
+    correo: "",
+    direccion: "",
   });
   const [cartItems, setCartItems] = useState([]);
 
   // Obtener los artículos del carrito desde localStorage
   useEffect(() => {
-    const storedItems = JSON.parse(localStorage.getItem('Compra')) || [];
+    const storedItems = JSON.parse(localStorage.getItem("Compra")) || [];
     setCartItems(storedItems);
   }, []);
 
   // Calcular el total de productos y el precio
   const totalItems = cartItems.length;
-  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0).toFixed(2);
+  const totalPrice = cartItems
+    .reduce((sum, item) => sum + item.price * (item.quantity || 1), 0)
+    .toFixed(2);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -104,7 +106,6 @@ const Pedido = () => {
     e.preventDefault();
 
     const { nombres, celular, correo, direccion } = formData;
-
     // Crear el mensaje con formato
     const message = `
 *Pedido Nuevo*
@@ -116,7 +117,12 @@ const Pedido = () => {
 - *Dirección:* ${direccion}
 
 *Resumen de la Compra:*
-${cartItems.map(item => `- ${item.name} (x${item.quantity || 1}) - S/ ${item.price.toFixed(2)}`).join('\n')}
+${cartItems
+  .map(
+    (item) =>
+      `- ${item.name} (x${item.quantity || 1}) - S/ ${item.price.toFixed(2)}`
+  )
+  .join("\n")}
 
 *Total:* S/ ${totalPrice}
     `.trim(); // Este es el mensaje con formato
@@ -125,10 +131,12 @@ ${cartItems.map(item => `- ${item.name} (x${item.quantity || 1}) - S/ ${item.pri
     localStorage.clear();
 
     // Redirigir al usuario a WhatsApp con el mensaje
-    window.open(`https://wa.me/51940467555?text=${encodeURIComponent(message)}`, '_blank');
-      // Recargar la página actual después de abrir WhatsApp
-  window.location.reload();
-
+    window.open(
+      `https://wa.me/51940467555?text=${encodeURIComponent(message)}`,
+      "_blank"
+    );
+    // Recargar la página actual después de abrir WhatsApp
+    window.location.reload();
   };
 
   return (
@@ -183,9 +191,7 @@ ${cartItems.map(item => `- ${item.name} (x${item.quantity || 1}) - S/ ${item.pri
               />
             </InputContainer>
 
-            <Button type="submit">
-              Pagar S/ {totalPrice}
-            </Button>
+            <Button type="submit">Pagar S/ {totalPrice}</Button>
           </Form>
         </FormSection>
 
@@ -194,14 +200,20 @@ ${cartItems.map(item => `- ${item.name} (x${item.quantity || 1}) - S/ ${item.pri
             <h3>Resumen de la compra</h3>
             <p>Total de productos: {totalItems}</p>
             <p>Total precio: S/ {totalPrice}</p>
-            
+
             {/* Mostrar los productos del carrito */}
             <ProductSummary>
               {cartItems.map((item, index) => (
                 <ProductRow key={index}>
-                  <div><strong>Nombre:</strong> {item.name}</div>
-                  <div><strong>Cantidad:</strong> {item.quantity}</div>
-                  <div><strong>Precio unitario:</strong> S/ {item.price}</div>
+                  <div>
+                    <strong>Nombre:</strong> {item.name}
+                  </div>
+                  <div>
+                    <strong>Cantidad:</strong> {item.quantity}
+                  </div>
+                  <div>
+                    <strong>Precio unitario:</strong> S/ {item.price}
+                  </div>
                 </ProductRow>
               ))}
             </ProductSummary>
