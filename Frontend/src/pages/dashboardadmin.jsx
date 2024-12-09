@@ -360,6 +360,74 @@ const DashboardAdmins = () => {
       <ModalWrapper isVisible={isModalVisible}>
         <ModalContent>
           <h3>Editar Producto</h3>
+          <form onSubmit={handleSubmit}>
+            <Label>Nombre</Label>
+            <InputField
+              type="text"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              placeholder="Nombre"
+            />
+            <Label>Precio</Label>
+            <InputField
+              type="number"
+              value={formData.price}
+              onChange={(e) =>
+                setFormData({ ...formData, price: parseInt(e.target.value) })
+              }
+              placeholder="Precio"
+            />
+            <Label>Descripción</Label>
+            <InputField
+              type="text"
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              placeholder="Descripción"
+            />
+            <Label>Stock</Label>
+            <InputField
+              type="number"
+              value={formData.stock}
+              onChange={(e) =>
+                setFormData({ ...formData, stock: parseInt(e.target.value) })
+              }
+              placeholder="Stock"
+            />
+
+            {/* Mostrar la imagen actual, si existe */}
+            {formData.imageUrl && (
+              <div style={{ display: "inline-block", marginRight: "10px" }}>
+                <h4>Imagen Actual:</h4>
+                <img
+                  src={formData.imageUrl}
+                  alt="Imagen del Producto"
+                  style={{
+                    height: "80px",
+                    width: "auto",
+                    marginBottom: "10px",
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Campo para cargar una nueva imagen */}
+            <div style={{ display: "inline-block", verticalAlign: "top" }}>
+              <InputField
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
+            </div>
+
+            <ModalButton type="submit">Modificar</ModalButton>
+            <CancelButton type="button" onClick={handleCancel}>
+              Cancelar
+            </CancelButton>
+          </form>
         </ModalContent>
       </ModalWrapper>
 
