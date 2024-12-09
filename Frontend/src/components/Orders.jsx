@@ -167,7 +167,7 @@ const CancelButton = styled.button`
 `;
 
 const DashboardAdmins = () => {
-  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [formData, setFormData] = useState({
     id: "",
     name: "",
@@ -189,24 +189,24 @@ const DashboardAdmins = () => {
     if (!admin) {
       navigate("/"); // Si no existe, redirige a la página de inicio
     } else {
-      fetchProducts();
+      fetchOrders();
     }
   }, [navigate]);
 
   // Obtener todos los productos del backend
-  const fetchProducts = async () => {
+  const fetchOrders = async () => {
     try {
-      const response = await fetch(`${apiBaseUrl}/products`);
+      const response = await fetch(`${apiBaseUrl}/orders`);
       const data = await response.json();
-      setProducts(data);
+      setOrders(data);
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error("Error fetching orders:", error);
     }
   };
 
-  // Editar un producto
-  const handleEdit = (product) => {
-    setFormData({ ...product });
+  // Editar una orden
+  const handleEdit = (order) => {
+    setFormData({ ...order });
     setIsModalVisible(true); // Mostrar el modal
   };
 
@@ -218,8 +218,6 @@ const DashboardAdmins = () => {
   // Enviar los cambios de edición
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("formData");
-    console.log(formData);
     // Crea una copia de los datos del formulario
     let dataToSend = { ...formData };
     // Eliminar campos vacíos o no modificados
@@ -233,7 +231,7 @@ const DashboardAdmins = () => {
       console.log("formData.id");
       console.log(formData.id);
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/products/${formData.id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/orders/${formData.id}`,
         {
           method: "PUT",
           headers: {
@@ -248,7 +246,7 @@ const DashboardAdmins = () => {
       // Manejamos la respuesta
       if (response.ok) {
         Swal.fire("Éxito", result.message, "success");
-        fetchProducts(); // Refresca la lista de productos
+        fetchOrders(); // Refresca la lista de ordenes
         setIsModalVisible(false); // Cierra el modal
       } else {
         Swal.fire(
@@ -258,12 +256,12 @@ const DashboardAdmins = () => {
         );
       }
     } catch (error) {
-      console.error("Error al modificar el producto:", error);
-      Swal.fire("Error", "Hubo un problema al modificar el producto", "error");
+      console.error("Error al modificar la orden", error);
+      Swal.fire("Error", "Hubo un problema al modificar la orden", "error");
     }
   };
 
-  // Eliminar producto
+  // Eliminar orden
   const handleDelete = async (id) => {
     try {
       const result = await Swal.fire({
@@ -276,40 +274,20 @@ const DashboardAdmins = () => {
       });
 
       if (result.isConfirmed) {
-        const response = await fetch(`${apiBaseUrl}/products/${id}`, {
+        const response = await fetch(`${apiBaseUrl}/orders/${id}`, {
           method: "DELETE",
         });
 
         if (response.ok) {
           Swal.fire("Eliminado", "Producto eliminado correctamente", "success");
-          fetchProducts(); // Refresca la lista de productos
+          fetchOrders(); // Refresca la lista de ordenes
         } else {
-          Swal.fire(
-            "Error",
-            "Hubo un problema al eliminar el producto",
-            "error"
-          );
+          Swal.fire("Error", "Hubo un problema al eliminar la orden", "error");
         }
       }
     } catch (error) {
-      console.error("Error al eliminar el producto:", error);
-      Swal.fire("Error", "Hubo un problema al eliminar el producto", "error");
-    }
-  };
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-
-    if (file) {
-      // Verificar si el archivo es una imagen válida
-      if (file.type.startsWith("image/")) {
-        setFormData({ ...formData, image: file }); // Guardamos el archivo en el estado
-      } else {
-        Swal.fire(
-          "Error",
-          "Por favor selecciona un archivo de imagen",
-          "error"
-        );
-      }
+      console.error("Error al eliminar la orden:", error);
+      Swal.fire("Error", "Hubo un problema al eliminarla orden", "error");
     }
   };
 
@@ -330,23 +308,25 @@ const DashboardAdmins = () => {
 
       {/* Cuerpo de la página */}
       <BodyWrapper>
-        <h2>Lista de Productos</h2>
+        <h2>Lista de Ordenes</h2>
         <ProductTable>
           <thead>
             <tr>
               <th>Nombre</th>
-              <th>Precio</th>
+              <th>Total</th>
+              <th>Estado</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {products.map((product) => (
-              <tr key={product.id}>
-                <td>{product.name}</td>
-                <td>{product.price}</td>
+            {orders.map((order) => (
+              <tr key={order.id}>
+                <td>{order.name}</td>
+                <td>{order.price}</td>
+                <td>{order.status}</td>
                 <td>
-                  <Button onClick={() => handleEdit(product)}>Modificar</Button>
-                  <Button onClick={() => handleDelete(product.id)}>
+                  <Button onClick={() => handleEdit(order)}>Modificar</Button>
+                  <Button onClick={() => handleDelete(order.id)}>
                     Eliminar
                   </Button>
                 </td>
@@ -359,7 +339,53 @@ const DashboardAdmins = () => {
       {/* Modal para editar el producto */}
       <ModalWrapper isVisible={isModalVisible}>
         <ModalContent>
-          <h3>Editar Producto</h3>
+          <h3>Editar Orden</h3>
+          <form onSubmit={handleSubmit}>
+            <Label>ID</Label>
+            <InputField
+              type="text"
+              value={formData.id}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              placeholder="Nombre"
+            />
+            <Label>Nombre</Label>
+            <InputField
+              type="text"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              placeholder="Nombre"
+            />
+            <Label>Precio Total</Label>
+            <InputField
+              type="number"
+              value={formData.price}
+              onChange={(e) =>
+                setFormData({ ...formData, price: parseInt(e.target.value) })
+              }
+              placeholder="Precio"
+            />
+            <Label>Estado</Label>
+            <InputField
+              type="text"
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              placeholder="Descripción"
+            />
+            <Label>Productos</Label>
+
+            {/* Listado de productos */}
+
+            <ModalButton type="submit">Modificar</ModalButton>
+            <CancelButton type="button" onClick={handleCancel}>
+              Cancelar
+            </CancelButton>
+          </form>
         </ModalContent>
       </ModalWrapper>
 
