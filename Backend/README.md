@@ -87,6 +87,7 @@ Stripe API Reference
 ## Autor
 
 - Github - [@Mikelyto1994](https://github.com/Mikelyto1994)
+- Github - [@francocasa](https://github.com/francocasa)
 
 ## Agradecimientos
 
